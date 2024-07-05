@@ -143,13 +143,13 @@ class Backtester():
     for i in range(len(df)):
       if self.balance > 0:
         if strategy.checkLongSignal(i):
-          self.open_position(price=close[i], side='long', from_opened=i)
-          self.set_take_profit(price=close[i], tp_long=1.03)
-          self.set_stop_loss(price=close[i], sl_long=0.99)
+          self.open_position(price=close.iloc[i], side='long', from_opened=i)
+          self.set_take_profit(price=close.iloc[i], tp_long=1.03)
+          self.set_stop_loss(price=close.iloc[i], sl_long=0.99)
         elif strategy.checkShortSignal(i):
-          self.open_position(price=close[i], side='short', from_opened=i)
-          self.set_take_profit(price=close[i], tp_short=0.97)
-          self.set_stop_loss(price=close[i], sl_short=1.01)
+          self.open_position(price=close.iloc[i], side='short', from_opened=i)
+          self.set_take_profit(price=close.iloc[i], tp_short=0.97)
+          self.set_stop_loss(price=close.iloc[i], sl_short=1.01)
         else:
           if self.trailing_stop_loss and (self.is_long_position_open or self.is_short_position_open):
             new_max_price = np.max(hight[self.from_opened:i])
@@ -161,15 +161,15 @@ class Backtester():
               self.stop_loss_price = previous_stop_loss_price
 
           if self.is_long_position_open:
-            if hight[i] >= self.take_profit_price:
+            if hight.iloc[i] >= self.take_profit_price:
               self.close_position(price=self.take_profit_price)
-            elif low[i] <= self.stop_loss_price:
+            elif low.iloc[i] <= self.stop_loss_price:
               self.close_position(price=self.stop_loss_price)
           
           if self.is_short_position_open:
-            if hight[i] >= self.stop_loss_price:
+            if hight.iloc[i] >= self.stop_loss_price:
               self.close_position(price=self.stop_loss_price)
-            elif low[i] <= self.take_profit_price:
+            elif low.iloc[i] <= self.take_profit_price:
               self.close_position(price=self.take_profit_price)
 
 
@@ -180,7 +180,7 @@ if __name__ == '__main__':
   exchange_class = getattr(ccxt, exchange_id)
   exchange = exchange_class()
 
-  ohclv = exchange.fetch_ohlcv('BTC/USDT', '1d', limit=1000)
+  ohclv = exchange.fetch_ohlcv('BTC/USDT', '1h', 1000)
   df = ccxt_ohlcv_to_df(ohclv)
 
   strategy = BBStrategy()
